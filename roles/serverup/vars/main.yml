@@ -1,0 +1,14 @@
+---
+# vars file for serverup
+
+conf_debian: /etc/php/7.4/fpm/pool.d/www.conf
+listen: /run/php/php7.4-fpm.sock
+listenrh: /run/php-fpm/www.sock 
+listen_owner: www-data
+listen_group: www-data
+listen_ownerrh: nginx
+listen_grouprh: nginx
+listen_mode: 0660
+
+UNIXfastcgi: /run/php/php7.4-fpm.sock
+UNIXfastcgirh: /run/php-fpm/www.sock

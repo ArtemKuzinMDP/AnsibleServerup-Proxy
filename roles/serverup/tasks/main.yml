@@ -1,0 +1,112 @@
+---
+# tasks file for serverup
+
+- block: Debian
+  - name: Install
+    yum: php
+    state: latest
+  - name: Delete strings listen
+    lineinfile: 
+      dest: /etc/php/7.4/fpm/pool.d/www.conf
+      state: absent
+      regexp: 'listen = *'
+  - name: Add strings listen
+    lineinfile: 
+      dest: /etc/php/7.4/fpm/pool.d/www.conf
+      state: present
+      line: 'listen = {{ listen }}'
+    - name: Delete strings 
+    lineinfile: 
+      dest: /etc/php/7.4/fpm/pool.d/www.conf
+      state: absent
+      regexp: 'listen.owner = *'
+    lineinfile: 
+      dest: /etc/php/7.4/fpm/pool.d/www.conf
+      state: absent
+      regexp: 'listen.group = *'
+    lineinfile: 
+      dest: /etc/php/7.4/fpm/pool.d/www.conf
+      state: absent
+      regexp: 'listen.mode = *'
+  - name: Add strings
+    lineinfile: 
+      dest: /etc/php/7.4/fpm/pool.d/www.conf
+      state: present
+      line: 'listen.owner = {{ listen_owner }}\nlisten.group = {{ listen_group }}\nlisten.mode = {{ listen_mode }}'
+  - name: Delete strings in nginx
+    lineinfile: 
+      dest: /etc/nginx/conf.d/example.com.conf
+      state: absent
+      regexp: 'fastcgi_pass *'
+  - name: Add strings in nginx
+    lineinfile: 
+      dest: /etc/nginx/conf.d/example.com.conf
+      state: present
+      line: 'fastcgi_pass unix: {{ UNIXfastcgi }}'
+   /etc/nginx/conf.d/example.com.conf
+  - name: Add config
+    copy: 
+      dest: /etc/php/7.4/fpm/pool.d/www.conf
+      content: 
+  - name: Check Syntax
+    shell: php-fpm -t
+    shell: nginx -t
+  - name: Restart
+    shell: systemctl restart nginx
+    shell: systemctl restart php7.4-fpm
+  when: ansible_os_family == "Debian"
+
+- block: RedHat
+  - name: Install
+    yum: php
+    state: latest
+  - name: Delete strings listen
+    lineinfile: 
+      dest: /etc/php-fpm.d/www.conf 
+      state: absent
+      regexp: 'listen = *'
+  - name: Add strings listen
+    lineinfile: 
+      dest: /etc/php-fpm.d/www.conf 
+      state: present
+      line: 'listen = {{ listenrh }}'
+    - name: Delete strings 
+    lineinfile: 
+      dest: /etc/php-fpm.d/www.conf 
+      state: absent
+      regexp: 'listen.owner = *'
+    lineinfile: 
+      dest: /etc/php-fpm.d/www.conf 
+      state: absent
+      regexp: 'listen.group = *'
+    lineinfile: 
+      dest: /etc/php-fpm.d/www.conf 
+      state: absent
+      regexp: 'listen.mode = *'
+  - name: Add strings
+    lineinfile: 
+      dest: /etc/php-fpm.d/www.conf 
+      state: present
+      line: 'listen.owner = {{ listen_ownerrh }}\nlisten.group = {{ listen_grouprh }}\nlisten.mode = {{ listen_mode }}'
+  - name: Delete strings in nginx
+    lineinfile: 
+      dest: /etc/nginx/conf.d/example.com.conf
+      state: absent
+      regexp: 'fastcgi_pass *'
+  - name: Add strings in nginx
+    lineinfile: 
+      dest: /etc/nginx/conf.d/example.com.conf
+      state: present
+      line: 'fastcgi_pass unix: {{ UNIXfastcgirh }}'
+   /etc/nginx/conf.d/example.com.conf
+  - name: Add config
+    copy: 
+      dest: /etc/php/7.4/fpm/pool.d/www.conf
+      content: 
+  - name: Check Syntax
+    shell: php-fpm -t
+    shell: nginx -t
+  - name: Restart
+    shell: systemctl restart nginx
+    shell: systemctl restart php7.4-fpm
+  when: ansible_os_family == "RedHat"
